@@ -1,0 +1,46 @@
+[Part 1]
+
+Program 1: Modify the program so that LED is on for 2 seconds and off for 1 second and
+repeats.
+
+Program 2: Modify the program so that the LED has two 1 second blinks followed by two
+2 second blinks and repeats.
+
+Programs 3 and 4: Working from the sample code in the Cookbook and the code you
+developed in the previous exercise, modify Programs 1 and 2 to blink the LED Brick rather 
+than the onboard LED. Develop the software, compile, and download it to the target. Verify
+the proper operation for each program. 
+
+Program 5: Starting with the Electronic_Bricks_Starter_Kit_Cookbook under documentation
+on the class webpage, now connect the Button Brick and the LED Brick to the
+microcontroller. Develop the software, compile, and download it to the target. Verify that
+the LED Brick can be controlled by the Button Brick.
+
+Program 6: Starting with the working C code, hw1.ino, in folder for this project, compile and
+download the program. When the program has completed downloading,
+Select
+• Tools
+o Serial Monitor
+A small window will open. Verify that the program is properly printing in that window. 
+
+Program 7: Starting with the working C code, hw1.ino and your working C code for
+homework assignment problem 1, modify the code for hw1.ino to incorporate your code for
+homework problem 1. The main change will be modifying any of your printf lines to the
+proper combinations of,
+Serial.print("stuff to print");
+Serial.println("stuff to print followed by new line");
+
+[Part 2]
+
+Program 1: Compile and download the program to the Arduino. Verify that the program is executing and
+properly displaying the Hello World message. 
+
+Program 2: Modify the program to print the first
+name of each lab partner. Print two names on the first row of the display and one on the
+second. 
+
+Program 3: Print a "X"
+
+Program 4: Two buttons controlling "X"
+
+Program 5: Communication
