@@ -56,6 +56,9 @@ void loop()
     phase++;
     if (1 == phase)
     {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.write(buffer);
       number1 = temp_number;
       number1_sign = temp_number_sign;
     }
