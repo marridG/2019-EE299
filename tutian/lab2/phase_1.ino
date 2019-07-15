@@ -2,100 +2,139 @@
 
 // initialize the library by associating any needed LCD interface pin
 // with the arduino pin number it is connected to
-// const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7, 8);
 
 char buffer[4] = {0, 0, 0, 0};
 int length = 0;
-int temp_number = 0;
-int temp_number_sign = 0;
 int number1 = 0;
-short number1_sign = 0;
 int number2 = 0;
-short number2_sign = 0;
-int outcome = 0;
 char operation = 0;
 short phase = 0;
-const int MAX_COL = 16;
-const int MAX_ROW = 2; // set up the maximum number of rows / columns in case of overflow
+
+int get_number()
+{
+  length = Serial.readBytesUntil('\n', buffer, 3); // Read to '\n' or at most 3 characteristics.
+                                                   // Return the number of read. '\n' is dropped.
+  Serial.print("Get ");
+  Serial.print(length);
+  Serial.print(" chars, current buffer: ");
+  Serial.println(buffer); // Serial for debug
+
+  int temp_number = 0;
+  int temp_number_sign = 0;
+
+  if (1 == length) // get a number
+  {
+    temp_number_sign = 1;
+    temp_number = buffer[0] - '0';
+  }
+
+  else if (2 == length) // get a number
+  {
+    if ('-' == buffer[0])
+    {
+      temp_number_sign = -1;
+      temp_number = buffer[1] - '0';
+    }
+    else
+    {
+      temp_number_sign = 1;
+      temp_number = (buffer[0] - '0') * 10 + (buffer[1] - '0');
+    }
+  }
+
+  else if (3 == length) // get a number
+  {
+    temp_number_sign = 1; // the sign of the number, 1 for positive and -1 for negative
+    if ('-' == buffer[0])
+      temp_number_sign = -1;
+
+    int buffer_cursor = (1 - temp_number_sign) / 2; // where the number start (avoid the sign)
+    // calculate the actual number
+    temp_number = (buffer[buffer_cursor] - '0') * 10 + (buffer[buffer_cursor + 1] - '0');
+  }
+
+  return temp_number * temp_number_sign;
+}
+
+int calculate()
+{
+  int outcome = 0;
+
+  switch (operation)
+  {
+  case '+':
+  {
+    outcome = number1 + number2;
+    break;
+  }
+  case '-':
+  {
+    outcome = number1 - number2;
+    break;
+  }
+  case '*':
+  {
+    outcome = number1 * number2;
+    break;
+  }
+  case '/':
+  {
+    outcome = number1 / number2;
+    break;
+  }
+  default:
+    lcd.print('ERROR!');
+  }
+
+  return outcome;
+}
 
 void setup()
 {
-  Serial.begin(9600);
-
-  // set up the LCD's number of columns and rows:
-  lcd.begin(MAX_COL, MAX_ROW);
+  Serial.begin(9600); // Start a Serial with 9600 bit rate
+  lcd.begin(16, 2);   // initialize the LCD pannel with 16 columns and 2 rows
 }
 
 void loop()
 {
-  if (Serial.available() > 0)
+  if (Serial.available() > 0) // Check if there is something new from Serial
   {
-    // Make sure the array is clean.
-    for (int i = 0; i < 4; i++)
-    {
-      buffer[i] = 0;
-    }
-    length = Serial.readBytesUntil('\n', buffer, 3);
-    // the '\n' is dropped then. Will return the number of characters.
-
-    Serial.print("The messgae in the buffer is: ");
-    Serial.println(buffer);
-    lcd.write(buffer);
-
-    if (1 != length)
-    {
-      temp_number_sign = 1;
-      if ('-' == buffer[0])
-        temp_number_sign = -1;
-
-      int buffer_cursor = (1 - temp_number_sign) / 2;
-      temp_number = (buffer[buffer_cursor] - '0') * 10 + (buffer[buffer_cursor + 1] - '0');
-    }
 
     phase++;
-    if (1 == phase)
+    switch (phase)
     {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.write(buffer);
-      number1 = temp_number;
-      number1_sign = temp_number_sign;
+    case 1: // the first two-digit number with one possible sign
+    {
+      lcd.clear();         // clear the lcd display for the next calculation
+      lcd.setCursor(0, 0); // set the cursor to top-left
+
+      number1 = get_number();
+      lcd.print(number1); // print the number on screen
+      break;              // DO NOT FORGET TO BREAK!
     }
-    if (2 == phase)
+    case 2: // the operator
     {
-      operation = buffer[0];
+      Serial.readBytesUntil('\n', buffer, 3);
+      operation = buffer[0]; // get the operator
+      lcd.write(operation);  // print the operator
+      break;                 // DO NOT FORGET TO BREAK!
     }
-    if (4 == phase)
+    case 3: // the second two-digit number with one possible sign
     {
-      switch (operation)
-      {
-      case '+':
-      {
-        outcome = number1 * number1_sign + temp_number * temp_number_sign;
-        break;
-      }
-      case '-':
-      {
-        outcome = number1 * number1_sign - temp_number * temp_number_sign;
-        break;
-      }
-      case '*':
-      {
-        outcome = number1 * number1_sign * temp_number * temp_number_sign;
-        break;
-      }
-      case '/':
-      {
-        outcome = number1 * number1_sign / temp_number * temp_number_sign;
-        break;
-      }
-      default:
-        lcd.print('ERROR!');
-      }
-      lcd.setCursor(0, 1);
-      lcd.print(outcome);
-      phase = 0;
+      number2 = get_number();
+      lcd.print(number2); // print the number
+      break;              // DO NOT FORGET TO BREAK!
+    }
+    case 4:
+    {
+      Serial.readBytesUntil('\n', buffer, 3);
+      lcd.write('=');         // print the '='
+      lcd.setCursor(0, 1);    // set the cursor to the first column of the second row
+      lcd.print(calculate()); // print the outcome
+      phase = 0;              // reset the phase
+      break;
+    }
     }
 
     delay(100);
