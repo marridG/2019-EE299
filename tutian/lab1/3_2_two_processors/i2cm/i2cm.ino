@@ -28,7 +28,8 @@ void loop()
       Wire.write('F');
       Serial.println("OFF");
     }
-    Wire.endTransmission;
+    Wire.endTransmission();
+    delay(200);
   }
-  delay(500);
+  delay(50);
 }

@@ -1,5 +1,5 @@
 {
     "board": "arduino:avr:uno",
-    "sketch": "lab1\\3_1_two_processors\\3_1_two_processors.ino",
-    "port": "COM5"
+    "port": "COM5",
+    "sketch": "lab1\\3_2_two_processors\\i2cm\\i2cm.ino"
 }
