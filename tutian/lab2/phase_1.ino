@@ -57,6 +57,20 @@ int get_number()
   return temp_number * temp_number_sign;
 }
 
+void print_number(int to_print)
+{
+  if(to_print >= 0)
+  {
+    lcd.print(to_print);
+  }
+  else
+  {
+    lcd.print('(');
+    lcd.print(to_print);
+    lcd.print(')');
+  }
+}
+
 int calculate()
 {
   int outcome = 0;
@@ -109,8 +123,8 @@ void loop()
       lcd.clear();         // clear the lcd display for the next calculation
       lcd.setCursor(0, 0); // set the cursor to top-left
 
-      number1 = get_number();
-      lcd.print(number1); // print the number on screen
+      number1 = get_number(); // get the first number
+      print_number(number1); // print the number on screen
       break;              // DO NOT FORGET TO BREAK!
     }
     case 2: // the operator
@@ -123,7 +137,7 @@ void loop()
     case 3: // the second two-digit number with one possible sign
     {
       number2 = get_number();
-      lcd.print(number2); // print the number
+      print_number(number2); // print the number
       break;              // DO NOT FORGET TO BREAK!
     }
     case 4:
