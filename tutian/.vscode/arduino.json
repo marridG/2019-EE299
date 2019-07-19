@@ -1,3 +1,5 @@
 {
-    "board": "arduino:avr:uno"
+    "board": "arduino:avr:uno",
+    "port": "COM7",
+    "sketch": "lab2\\phase_1.ino"
 }
