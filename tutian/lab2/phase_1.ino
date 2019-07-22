@@ -59,7 +59,7 @@ int get_number()
 
 void print_number(int to_print)
 {
-  if(to_print >= 0)
+  if (to_print >= 0)
   {
     lcd.print(to_print);
   }
@@ -95,6 +95,10 @@ int calculate()
   case '/':
   {
     outcome = number1 / number2;
+    if (0 == number2)
+    {
+      lcd.print('ERROR!');
+    }
     break;
   }
   default:
@@ -124,8 +128,8 @@ void loop()
       lcd.setCursor(0, 0); // set the cursor to top-left
 
       number1 = get_number(); // get the first number
-      print_number(number1); // print the number on screen
-      break;              // DO NOT FORGET TO BREAK!
+      print_number(number1);  // print the number on screen
+      break;                  // DO NOT FORGET TO BREAK!
     }
     case 2: // the operator
     {
@@ -138,7 +142,7 @@ void loop()
     {
       number2 = get_number();
       print_number(number2); // print the number
-      break;              // DO NOT FORGET TO BREAK!
+      break;                 // DO NOT FORGET TO BREAK!
     }
     case 4:
     {

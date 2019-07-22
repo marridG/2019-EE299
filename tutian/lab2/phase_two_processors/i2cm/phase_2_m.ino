@@ -54,7 +54,7 @@ int get_number()
   return temp_number * temp_number_sign;
 }
 
-void print_number(int to_print, bool bracket=false)
+void print_number(int to_print, bool bracket = false)
 {
   char temp[7];
   String(to_print).toCharArray(temp, 7);
@@ -130,9 +130,9 @@ void loop()
       // lcd.clear();         // clear the lcd display for the next calculation
       // lcd.setCursor(0, 0); // set the cursor to top-left
 
-      number1 = get_number(); // get the first number
-      print_number(number1, true);  // print the number on screen
-      break;                  // DO NOT FORGET TO BREAK!
+      number1 = get_number();      // get the first number
+      print_number(number1, true); // print the number on screen
+      break;                       // DO NOT FORGET TO BREAK!
     }
     case 2: // the operator
     {
@@ -145,7 +145,7 @@ void loop()
     {
       number2 = get_number();
       print_number(number2, true); // print the number
-      break;                 // DO NOT FORGET TO BREAK!
+      break;                       // DO NOT FORGET TO BREAK!
     }
     case 4:
     {
