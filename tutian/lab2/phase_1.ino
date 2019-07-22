@@ -97,12 +97,12 @@ int calculate()
     outcome = number1 / number2;
     if (0 == number2)
     {
-      lcd.print('ERROR!');
+      lcd.print("ERROR!");
     }
     break;
   }
   default:
-    lcd.print('ERROR!');
+    lcd.print("ERROR!");
   }
 
   return outcome;
@@ -118,7 +118,6 @@ void loop()
 {
   if (Serial.available() > 0) // Check if there is something new from Serial
   {
-
     phase++;
     switch (phase)
     {
@@ -154,7 +153,6 @@ void loop()
       break;
     }
     }
-
     delay(100);
   }
 }
