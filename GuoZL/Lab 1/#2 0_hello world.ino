@@ -1,6 +1,35 @@
 /*
+Module Name:
+  #2 0_hello world.ino
+
+Description:
+  Print "hello, world!" on the LCD display and blink in an
+  interval of 500ms.
+
+Code source:
+  Examples -> LiquidCrystal -> HelloWorld
   LiquidCrystal Library - display() and noDisplay()
 
+With reference to:
+  https://www.arduino.cc/en/Reference/LiquidCrystal
+  Electronic Bricks Starter Kit Cookbook v1.3
+
+Modifications applied:
+  We used BUS 1 to connect the LCD display, so the pin numbers
+  are modified to "lcd(2, 3, 4, 5, 6, 7, 8);"
+
+Public Interface:
+  Show "hello, world!" on the LCD display
+
+Side Effects:
+  No
+
+Authors:
+  Shihao Piao, Tutian Tang, Ziliang Guo
+Rev. 0 - 8 Jul
+*/
+
+/*
  Demonstrates the use a 16x2 LCD display.  The LiquidCrystal
  library works with all LCD displays that are compatible with the
  Hitachi HD44780 driver. There are many of them out there, and you
@@ -37,7 +66,7 @@
 
  http://www.arduino.cc/en/Tutorial/LiquidCrystalDisplay
 
-*/
+ */
 
 // include the library code:
 #include <LiquidCrystal.h>
@@ -47,13 +76,25 @@
 const int rs = 2, en = 3, d4 = 4, d5 = 5, d6 = 6, d7 = 7, d8 = 8;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7, d8);
 
+/**
+ * [setup description]
+ *   setup all the hardware pin numbers and initialize the displayed
+ *   text of LCD
+ * @return {NONE}
+ */
 void setup() {
-  // set up the LCD's number of columns and rows:
+  // set up the LCD's number of columns and rows: 16 cols & 2 rows
   lcd.begin(16, 2);
   // Print a message to the LCD.
   lcd.print("hello, world!");
 }
 
+/**
+ * [loop description]
+ *   continuously blink to display and hide "hello, world!" on the LCD
+ *   display in an interval of 500ms.
+ * @return {NONE}
+ */
 void loop() {
   // Turn off the display:
   lcd.noDisplay();
