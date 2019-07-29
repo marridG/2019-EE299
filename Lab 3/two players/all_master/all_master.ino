@@ -1,3 +1,5 @@
+#include<Wire.h>
+
 int board[4][4] = {{0, 0, 0, 0},
     {0, 0, 0, 0},
     {0, 0, 0, 0},
@@ -6,6 +8,8 @@ int board[4][4] = {{0, 0, 0, 0},
 
 int player_psn[] = {0, 0};
 int life = 1;
+
+int bombs[4][2] = {0};
 
 void display_set_board()
 {
@@ -115,7 +119,6 @@ void set_board()
         {0, 0, 0, 0},
         {0, 0, 0, 0}
     };
-    int bombs[4][2] = {0};
     int input_row = -1;
     int input_col = -1;
 
@@ -137,7 +140,7 @@ void set_board()
         input_col = Serial.read() - '0';
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
-            pponent_board[input_row][input_col] = 1;
+            opponent_board[input_row][input_col] = 1;
             bombs[0][0] = input_row;
             bombs[0][1] = input_col;
             display_set_board();
@@ -156,7 +159,7 @@ void set_board()
         input_col = Serial.read() - '0';
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
-            pponent_board[input_row][input_col] = 1;
+            opponent_board[input_row][input_col] = 1;
             bombs[1][0] = input_row;
             bombs[1][1] = input_col;
             display_set_board();
@@ -175,7 +178,7 @@ void set_board()
         input_col = Serial.read() - '0';
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
-            pponent_board[input_row][input_col] = 1;
+            opponent_board[input_row][input_col] = 1;
             bombs[2][0] = input_row;
             bombs[2][1] = input_col;
             display_set_board();
@@ -194,7 +197,7 @@ void set_board()
         input_col = Serial.read() - '0';
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
-            pponent_board[input_row][input_col] = 1;
+            opponent_board[input_row][input_col] = 1;
             bombs[3][0] = input_row;
             bombs[3][1] = input_col;
             display_set_board();
@@ -212,12 +215,12 @@ void set_board()
     Wire.beginTransmission(4); // transmit to device #4
     for(int i=0;i<8;i++)
     {
-        Wire.write(bombs[i]);
+        Wire.write(*bombs[i]);
     }
     Wire.endTransmission();    // ends the transmission
 
     // transimit end
-    Seiral.println("===== [END] Set mines =====\n");
+    Serial.println("===== [END] Set mines =====\n");
 
 }
 
@@ -235,13 +238,13 @@ void get_board()
             continue;
         }
 
-        bombs[psn] = Wire.read();
+        *bombs[psn] = Wire.read();
         psn++;
     }
 
-    for(int i=0;<4;i++)
+    for(int i=0;i<4;i++)
     {
-        board[bombs[2*i][bombs[2*i+1]] = 1;
+        board[*bombs[2*i]][*bombs[2*i+1]] = 1;
     }
 }
 
