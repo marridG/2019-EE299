@@ -1,3 +1,5 @@
+#include <Wire.h>
+
 int board[4][4] = {{0, 0, 0, 0},
     {0, 0, 0, 0},
     {0, 0, 0, 0},
@@ -9,6 +11,7 @@ int life = 1;
 
 int bombs_ready = 0; // 0 for not ready to send, 1 for ready
 int bombs[4][2] = {0};
+int opponent_status=-99;
 
 void display_set_board()
 {
@@ -139,7 +142,7 @@ void set_board()
         input_col = Serial.read() - '0';
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
-            pponent_board[input_row][input_col] = 1;
+            opponent_board[input_row][input_col] = 1;
             bombs[0][0] = input_row;
             bombs[0][1] = input_col;
             display_set_board();
@@ -158,7 +161,7 @@ void set_board()
         input_col = Serial.read() - '0';
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
-            pponent_board[input_row][input_col] = 1;
+            opponent_board[input_row][input_col] = 1;
             bombs[1][0] = input_row;
             bombs[1][1] = input_col;
             display_set_board();
@@ -177,7 +180,7 @@ void set_board()
         input_col = Serial.read() - '0';
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
-            pponent_board[input_row][input_col] = 1;
+            opponent_board[input_row][input_col] = 1;
             bombs[2][0] = input_row;
             bombs[2][1] = input_col;
             display_set_board();
@@ -196,7 +199,7 @@ void set_board()
         input_col = Serial.read() - '0';
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
-            pponent_board[input_row][input_col] = 1;
+            opponent_board[input_row][input_col] = 1;
             bombs[3][0] = input_row;
             bombs[3][1] = input_col;
             display_set_board();
@@ -372,7 +375,7 @@ void myHandler()
 
     for (int i=0;i<8;i++)
     {
-        Wire.write(bombs[i]);
+        Wire.write(*bombs[i]);
     }
 
 }
@@ -382,7 +385,7 @@ void setup()
     Serial.begin(9600);
     Wire.begin(4);                // join i2c bus with address #4
     Wire.onReceive(receiveEvent); // register event
-    Wire.onRequest(handler);
+    Wire.onRequest(myHandler);
     randomSeed(analogRead(0));
     clean_up();
 }
