@@ -223,6 +223,9 @@ void init_game()
     int i = 0, j = 0, k = 0; // temp variables - for loop control
 
     // initialize the status of the board
+    for(i=0;i<=3;i++)
+    	for(j=0;j<=3;j++)
+    		board[i][j]=0;
     board[0][0] = 9;  // starting position
     board[3][3] = 10; // ending position
 
@@ -231,10 +234,13 @@ void init_game()
     player_psn[0] = 0;
     player_psn[1] = 0;
 
-    // get the locations of the mines from I2C and set the board
-    k = 0; // number of already set mines
-    //........
-    board[i][j] = 1;
+    // set board
+    set_board();
+
+    while(2!=opponent_status)
+    {
+    	delay(100);
+    }
 }
 
 /**
@@ -344,6 +350,7 @@ void get_input()
 
 void clean_up()
 {
+
     init_game();
     delay(3000);
     Serial.println("\n\n--------------- NEW GAME ---------------\n\n");
@@ -361,7 +368,6 @@ void receiveEvent(int howMany)
           int y = Wire.read();
           board[x][y] = 1;
       }
-      opponent_status = 2;
   }
 }
 
@@ -373,10 +379,12 @@ void myHandler()
         return;
     }
 
-    for (int i=0;i<8;i++)
-    {
-        Wire.write(*bombs[i]);
-    }
+    for (int i=0;i<=3;i++)
+    	for (int j=0;j<=1;j++)
+    		Wire.write(bombs[i][j]);
+
+    opponent_status = 2;
+
 
 }
 
