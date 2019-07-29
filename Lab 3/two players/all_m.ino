@@ -1,3 +1,6 @@
+#include <Wire.h>   // library for I2C Bus
+
+
 int board[4][4] = {{0, 0, 0, 0},
                    {0, 0, 0, 0},
                    {0, 0, 0, 0},
@@ -5,6 +8,7 @@ int board[4][4] = {{0, 0, 0, 0},
 
 int player_psn[] = {0, 0};
 int life = 1;
+int opponent_status = 0; // -1 / 0 / 99 / -2
 
 void display(bool show_bomb = false)
 {
@@ -226,7 +230,7 @@ void clean_up()
 void setup()
 {
     Serial.begin(9600);
-    randomSeed(analogRead(0));
+    Wire.begin();       // join i2c bus (address optional for master)
     clean_up();
 }
 
