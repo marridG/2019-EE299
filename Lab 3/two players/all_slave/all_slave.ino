@@ -124,11 +124,6 @@ void set_board()
     int input_row = -1;
     int input_col = -1;
 
-    while (Serial.available() <= 0)
-    {
-        delay(100);
-    }
-
     Serial.println("===== Set mines for the other player =====");
     Serial.println("The locations of the 4*4 board starts at (0,0) and ends at (3,3).");
     Serial.println("You can set altogether 4 mines. Please do not set mines at (0,0) or (3,3).\n");
@@ -137,9 +132,15 @@ void set_board()
     while(1)
     {
         Serial.println("Please enter the ROW of the 1 ST mine:");
+        while (Serial.available() <= 0) delay(100);
         input_row = Serial.read() - '0';
+        if(0>input_row||3<input_row)
+        	Serial.println("Wong Input!");
         Serial.println("Please enter the COLUMN of the 1 ST mine:");
+        while (Serial.available() <= 0) delay(100);
         input_col = Serial.read() - '0';
+        if(0>input_col||3<input_col)
+        	Serial.println("Wong Input!");
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
             opponent_board[input_row][input_col] = 1;
@@ -156,9 +157,15 @@ void set_board()
     while(2)
     {
         Serial.println("Please enter the ROW of the 2 ND mine:");
+        while (Serial.available() <= 0) delay(100);
         input_row = Serial.read() - '0';
+        if(0>input_row||3<input_row)
+        	Serial.println("Wong Input!");
         Serial.println("Please enter the COLUMN of the 2 ND mine:");
+        while (Serial.available() <= 0) delay(100);
         input_col = Serial.read() - '0';
+        if(0>input_col||3<input_col)
+        	Serial.println("Wong Input!");
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
             opponent_board[input_row][input_col] = 1;
@@ -175,9 +182,15 @@ void set_board()
     while(3)
     {
         Serial.println("Please enter the ROW of the 3 RD mine:");
+        while (Serial.available() <= 0) delay(100);
         input_row = Serial.read() - '0';
+        if(0>input_row||3<input_row)
+        	Serial.println("Wong Input!");
         Serial.println("Please enter the COLUMN of the 3 RD mine:");
+        while (Serial.available() <= 0) delay(100);
         input_col = Serial.read() - '0';
+        if(0>input_col||3<input_col)
+        	Serial.println("Wong Input!");
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
             opponent_board[input_row][input_col] = 1;
@@ -194,9 +207,15 @@ void set_board()
     while(4)
     {
         Serial.println("Please enter the ROW of the 4 TH mine:");
+        while (Serial.available() <= 0) delay(100);
         input_row = Serial.read() - '0';
+        if(0>input_row||3<input_row)
+        	Serial.println("Wong Input!");
         Serial.println("Please enter the COLUMN of the 4 TH mine:");
+        while (Serial.available() <= 0) delay(100);
         input_col = Serial.read() - '0';
+        if(0>input_col||3<input_col)
+        	Serial.println("Wong Input!");
         if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
         {
             opponent_board[input_row][input_col] = 1;
