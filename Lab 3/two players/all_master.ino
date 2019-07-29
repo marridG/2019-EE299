@@ -7,9 +7,6 @@ int board[4][4] = {{0, 0, 0, 0},
 int player_psn[] = {0, 0};
 int life = 1;
 
-int bombs_ready = 0; // 0 for not ready to send, 1 for ready
-int bombs[4][2] = {0};
-
 void display_set_board()
 {
     for (int j = 0; j < 4; ++j)
@@ -118,6 +115,7 @@ void set_board()
         {0, 0, 0, 0},
         {0, 0, 0, 0}
     };
+    int bombs[4][2] = {0};
     int input_row = -1;
     int input_col = -1;
 
@@ -208,10 +206,43 @@ void set_board()
 
     Serial.println("\nOpponent Board Set!\n");
 
-    bombs_ready = 1;
-
     // transmit
-    Serial.println("--- Ready to transmit ---");
+    Serial.println("--- Transmitting ---");
+    
+    Wire.beginTransmission(4); // transmit to device #4
+    for(int i=0;i<8;i++)
+    {
+        Wire.write(bombs[i]);
+    }
+    Wire.endTransmission();    // ends the transmission
+
+    // transimit end
+    Seiral.println("===== [END] Set mines =====\n");
+
+}
+
+void get_board()
+{
+    Wire.requestFrom(4, 8);
+    int temp = 255;
+    int psn = 0;
+    while(temp = Wire.read())
+    {
+        if (233== temp)
+        {
+            delay(1000);
+            Serial.println("Slave bombs not ready...\n");
+            continue;
+        }
+
+        bombs[psn] = Wire.read();
+        psn++;
+    }
+
+    for(int i=0;<4;i++)
+    {
+        board[bombs[2*i][bombs[2*i+1]] = 1;
+    }
 }
 
 
@@ -347,42 +378,10 @@ void clean_up()
     display();
 }
 
-void receiveEvent(int howMany)
-{
-  if (8 == howMany)
-  {
-      Serial.println("\nReceiving the board from master...\n");
-      for(int i=0;i<4;i++)
-      {
-          int x = Wire.read();
-          int y = Wire.read();
-          board[x][y] = 1;
-      }
-      opponent_status = 2;
-  }
-}
-
-void myHandler()
-{
-    if (!bombs_ready)
-    {
-        Wire.write(233);
-        return;
-    }
-
-    for (int i=0;i<8;i++)
-    {
-        Wire.write(bombs[i]);
-    }
-
-}
-
 void setup()
 {
     Serial.begin(9600);
-    Wire.begin(4);                // join i2c bus with address #4
-    Wire.onReceive(receiveEvent); // register event
-    Wire.onRequest(handler);
+    Wire.begin();       // join i2c bus (address optional for master)
     randomSeed(analogRead(0));
     clean_up();
 }

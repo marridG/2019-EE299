@@ -1,46 +1,21 @@
+#include <Wire.h>   // library for I2C Bus
+
 int board[4][4] = {{0, 0, 0, 0},
-    {0, 0, 0, 0},
-    {0, 0, 0, 0},
-    {0, 0, 0, 0}
-};
+                   {0, 0, 0, 0},
+                   {0, 0, 0, 0},
+                   {0, 0, 0, 0}};
 
 int player_psn[] = {0, 0};
 int life = 1;
+int opponent_status = 0; // -1 / 0 / 99 / -2
+int bomb_set = 0;  // 0 for not set up yet, 1 for set up
 
-int bombs_ready = 0; // 0 for not ready to send, 1 for ready
-int bombs[4][2] = {0};
-
-void display_set_board()
-{
-    for (int j = 0; j < 4; ++j)
-    {
-        //cout<<"--------------\n";
-        Serial.print("           ");
-        for (int i = 0; i < 4; ++i)
-        {
-            switch (board[j][i])
-            {
-            case 0:						// no mines
-                Serial.print("  ");
-                break;
-            default:					// a mine here
-                Serial.print("* ");
-                break;
-            }
-
-            if (3 == i)
-                Serial.print("\n");
-        }
-    }
-    //cout<<"--------------\n";
-}
 
 void display(bool show_bomb = false)
 {
     int flag;
     for (int j = 0; j < 4; ++j)
-    {
-        //cout<<"--------------\n";
+    { //cout<<"--------------\n";
         Serial.print("           ");
         for (int i = 0; i < 4; ++i)
         {
@@ -108,118 +83,14 @@ void display(bool show_bomb = false)
     Serial.println(life);
 }
 
-/**
- * 29 Jul
- */
-void set_board()
-{
-    int opponent_board[4][4] = {{0, 0, 0, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0}
-    };
-    int input_row = -1;
-    int input_col = -1;
-
-    while (Serial.available() <= 0)
-    {
-        delay(100);
-    }
-
-    Serial.println("===== Set mines for the other player =====");
-    Serial.println("The locations of the 4*4 board starts at (0,0) and ends at (3,3).");
-    Serial.println("You can set altogether 4 mines. Please do not set mines at (0,0) or (3,3).\n");
-
-    // set the 1 st mine
-    while(1)
-    {
-        Serial.println("Please enter the ROW of the 1 ST mine:");
-        input_row = Serial.read() - '0';
-        Serial.println("Please enter the COLUMN of the 1 ST mine:");
-        input_col = Serial.read() - '0';
-        if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
-        {
-            pponent_board[input_row][input_col] = 1;
-            bombs[0][0] = input_row;
-            bombs[0][1] = input_col;
-            display_set_board();
-            break;
-        }
-        else
-            Serial.println("Invalid mine location. Please try again!\n");
-    }
-
-    // set the 2 nd mine
-    while(2)
-    {
-        Serial.println("Please enter the ROW of the 2 ND mine:");
-        input_row = Serial.read() - '0';
-        Serial.println("Please enter the COLUMN of the 2 ND mine:");
-        input_col = Serial.read() - '0';
-        if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
-        {
-            pponent_board[input_row][input_col] = 1;
-            bombs[1][0] = input_row;
-            bombs[1][1] = input_col;
-            display_set_board();
-            break;
-        }
-        else
-            Serial.println("Invalid mine location. Please try again!\n");
-    }
-
-    // set the 3 rd mine
-    while(3)
-    {
-        Serial.println("Please enter the ROW of the 3 RD mine:");
-        input_row = Serial.read() - '0';
-        Serial.println("Please enter the COLUMN of the 3 RD mine:");
-        input_col = Serial.read() - '0';
-        if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
-        {
-            pponent_board[input_row][input_col] = 1;
-            bombs[2][0] = input_row;
-            bombs[2][1] = input_col;
-            display_set_board();
-            break;
-        }
-        else
-            Serial.println("Invalid mine location. Please try again!\n");
-    }
-
-    // set the 4 th mine
-    while(4)
-    {
-        Serial.println("Please enter the ROW of the 4 TH mine:");
-        input_row = Serial.read() - '0';
-        Serial.println("Please enter the COLUMN of the 4 TH mine:");
-        input_col = Serial.read() - '0';
-        if(1 != opponent_board[input_row][input_col] || (input_row + input_col != 0))
-        {
-            pponent_board[input_row][input_col] = 1;
-            bombs[3][0] = input_row;
-            bombs[3][1] = input_col;
-            display_set_board();
-            break;
-        }
-        else
-            Serial.println("Invalid mine location. Please try again!\n");
-    }
-
-    Serial.println("\nOpponent Board Set!\n");
-
-    bombs_ready = 1;
-
-    // transmit
-    Serial.println("--- Ready to transmit ---");
-}
-
-
 void init_game()
 {
     int i = 0, j = 0, k = 0; // temp variables - for loop control
 
     // initialize the status of the board
+    for (i = 0; i <= 3; i++)
+        for (j = 0; j <= 3; j++)
+            board[i][j] = 0;
     board[0][0] = 9;  // starting position
     board[3][3] = 10; // ending position
 
@@ -228,10 +99,20 @@ void init_game()
     player_psn[0] = 0;
     player_psn[1] = 0;
 
-    // get the locations of the mines from I2C and set the board
+    // randomly set mines on the board, except for the starting and ending positions
     k = 0; // number of already set mines
-    //........
-    board[i][j] = 1;
+    while (k <= 3)
+    {
+        i = random(4); // get a random row number: 0-3
+        j = random(4); // get a randon column number: 0-3
+
+        // judge whether a mine can be placed on the randomly generated position
+        if (board[i][j] != 1 && board[i][j] != 9 && board[i][j] != 10)
+        {
+            board[i][j] = 1;
+            k++;
+        }
+    }
 }
 
 /**
@@ -360,20 +241,10 @@ void receiveEvent(int howMany)
       }
       opponent_status = 2;
   }
-}
-
-void myHandler()
-{
-    if (!bombs_ready)
-    {
-        Wire.write(233);
-        return;
-    }
-
-    for (int i=0;i<8;i++)
-    {
-        Wire.write(bombs[i]);
-    }
+  else if (1 == howMany)
+  {
+      char a = 
+  }
 
 }
 
@@ -382,7 +253,6 @@ void setup()
     Serial.begin(9600);
     Wire.begin(4);                // join i2c bus with address #4
     Wire.onReceive(receiveEvent); // register event
-    Wire.onRequest(handler);
     randomSeed(analogRead(0));
     clean_up();
 }
