@@ -5,6 +5,11 @@ int board[4][4] = {{0, 0, 0, 0},
     {0, 0, 0, 0},
     {0, 0, 0, 0}
 };
+int opponent_board[4][4] = {{0, 0, 0, 0},
+    {0, 0, 0, 0},
+    {0, 0, 0, 0},
+    {0, 0, 0, 0}
+};
 
 int player_psn[] = {0, 0};
 int life = 1;
@@ -21,7 +26,7 @@ void display_set_board()
         Serial.print("           ");
         for (int i = 0; i < 4; ++i)
         {
-            switch (board[j][i])
+            switch (opponent_board[j][i])
             {
             case 0:						// no mines
                 Serial.print("  ");
@@ -111,16 +116,37 @@ void display(bool show_bomb = false)
     Serial.println(life);
 }
 
+void set_board_print_count(int num)
+{
+	if(1==num)
+		Serial.println(" 1 ST mine:");
+	else if(2==num)
+		Serial.println(" 2 ND ");
+	else if(3==num)
+		Serial.println(" 3 RD ");
+	else
+		Serial.println(" 4 TH ");
+}
+
+int set_board_get_input()
+{
+	int input_temp=0;
+	while (Serial.available() <= 0)
+		delay(100);
+    input_temp = Serial.read() - '0';
+    if(0 > input_temp || 3 < input_temp)
+    {
+	   	Serial.println("Wong Input!");
+	   	return -1;
+    }
+}
+
+
 /**
  * 29 Jul
  */
 void set_board()
 {
-    int opponent_board[4][4] = {{0, 0, 0, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0}
-    };
     int input_row = -1;
     int input_col = -1;
 
