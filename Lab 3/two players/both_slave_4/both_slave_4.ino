@@ -9,6 +9,8 @@ int opponent_board[4][4] = {{0, 0, 0, 0},
                             {0, 0, 0, 0},
                             {0, 0, 0, 0}};
 
+char board_char[] = {' ', '*', 'X', '!', '!', '.', '!', '!', '!', '>', '>'};
+
 int player_psn[] = {0, 0};
 int life = 1;
 
@@ -17,25 +19,18 @@ int opponent_status = -99; // 2 for bombs set, -1 for he loses, 99 for he wins
 
 void display_set_board()
 {
+    Serial.print("           +---+---+---+---+\n");
     for (int j = 0; j < 4; ++j)
     {
         //cout<<"--------------\n";
-        Serial.print("           ");
+        Serial.print("           |");
         for (int i = 0; i < 4; ++i)
         {
-            switch (opponent_board[j][i])
-            {
-            case 0: // no mines
-                Serial.print("  ");
-                break;
-            default: // a mine here
-                Serial.print("* ");
-                break;
-            }
-
-            if (3 == i)
-                Serial.print("\n");
+            Serial.print(" ");
+            Serial.print(board_char[opponent_board[j][i]]);
+            Serial.print(" |");
         }
+        Serial.print("\n           +---+---+---+---+\n");
     }
     //cout<<"--------------\n";
 }
@@ -149,7 +144,7 @@ bool set_board_get_input(int loc_count)
         loc_row = Serial.read() - '0';
 
         if (loc_row < 0 || loc_row > 3)
-            Serial.println("Wrong Input Index!");
+            Serial.println("Wrong Input ROW Index!");
         else
             break;
     }
@@ -162,7 +157,7 @@ bool set_board_get_input(int loc_count)
         loc_col = Serial.read() - '0';
 
         if (loc_col < 0 || loc_col > 3)
-            Serial.println("Wrong Input Index!");
+            Serial.println("Wrong Input COLUMN Index!");
         else
             break;
     }
@@ -176,6 +171,7 @@ bool set_board_get_input(int loc_count)
     else
     {
         opponent_board[loc_row][loc_col] = 1;
+        display_set_board();
         return true;
     }
 }
@@ -188,6 +184,8 @@ void set_board()
     Serial.println("===== Set mines for the other player =====");
     Serial.println("The locations of the 4*4 board starts at (0,0) and ends at (3,3).");
     Serial.println("You can set altogether 4 mines. Please do not set mines at (0,0) or (3,3).\n");
+
+    display_set_board();
 
     for (int i = 1; i <= 4; i++)
     {
@@ -208,8 +206,12 @@ void init_game()
     for (i = 0; i <= 3; i++)
         for (j = 0; j <= 3; j++)
             board[i][j] = 0;
+    opponent_board[i][j] = 0;
     board[0][0] = 9;  // starting position
     board[3][3] = 10; // ending position
+
+    opponent_board[0][0] = 9;  // starting position
+    opponent_board[3][3] = 10; // ending position
 
     // initialize the status of the player
     life = 2;
@@ -422,10 +424,9 @@ void end_message(int my_state)
     Serial.print(temp);
     Serial.print("\n");
 
-
     if (-2 == opponent_status)
     {
-        Serial.println("Waiting for your opponent...")
+        Serial.println("Waiting for your opponent...");
     }
     while (-2 == opponent_status)
     {
@@ -433,7 +434,6 @@ void end_message(int my_state)
     }
 
     delay(3000);
-
 }
 
 void setup()
@@ -458,7 +458,7 @@ void loop()
 
         end_message(judge_state);
 
-        clean_up();
+        new_game();
     }
     else if (99 == judge_state)
     {
@@ -469,7 +469,7 @@ void loop()
 
         end_message(judge_state);
 
-        clean_up();
+        new_game();
     }
     else
     {
