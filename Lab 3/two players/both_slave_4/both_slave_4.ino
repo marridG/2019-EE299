@@ -37,7 +37,6 @@ void display_set_board()
 
 void display(bool show_bomb = false)
 {
-    int flag;
     for (int j = 0; j < 4; ++j)
     {
         //cout<<"--------------\n";
@@ -53,16 +52,8 @@ void display(bool show_bomb = false)
                 }
                 continue;
             }
-            flag = board[j][i];
 
-            switch (flag)
-            {
-            case 0:
-            {
-                Serial.print("  ");
-                break;
-            }
-            case 1:
+            if (1 == board[j][i])
             {
                 if (show_bomb)
                 {
@@ -72,36 +63,14 @@ void display(bool show_bomb = false)
                 {
                     Serial.print("  ");
                 }
-                break;
             }
-            case 2:
+            else
             {
-                Serial.print("X ");
-                break;
+                Serial.print(board_char[board[j][i]]);
+                Serial.print(' ');
             }
-            case 5:
-            {
-                Serial.print(". ");
-                break;
-            }
-            case 9:
-            {
-                Serial.print("> ");
-                break;
-            }
-            case 10:
-            {
-                Serial.print("> ");
-                break;
-            }
-
-            default:
-                break;
-            }
-
-            if (3 == i)
-                Serial.print("\n");
         }
+        Serial.print("\n");
     }
     //cout<<"--------------\n";
     Serial.print("Life: ");
