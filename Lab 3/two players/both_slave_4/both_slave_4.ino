@@ -1,22 +1,19 @@
 #include <Wire.h>
 
 int board[4][4] = {{0, 0, 0, 0},
-    {0, 0, 0, 0},
-    {0, 0, 0, 0},
-    {0, 0, 0, 0}
-};
+                   {0, 0, 0, 0},
+                   {0, 0, 0, 0},
+                   {0, 0, 0, 0}};
 int opponent_board[4][4] = {{0, 0, 0, 0},
-    {0, 0, 0, 0},
-    {0, 0, 0, 0},
-    {0, 0, 0, 0}
-};
+                            {0, 0, 0, 0},
+                            {0, 0, 0, 0},
+                            {0, 0, 0, 0}};
 
 int player_psn[] = {0, 0};
 int life = 1;
 
-int bombs_ready = 0; // 0 for not ready to send, 1 for ready
 int bombs[4][2] = {0};
-int opponent_status = -99;
+int opponent_status = -99; // 2 for bombs set, -1 for he loses, 99 for he wins
 
 void display_set_board()
 {
@@ -28,10 +25,10 @@ void display_set_board()
         {
             switch (opponent_board[j][i])
             {
-            case 0:                     // no mines
+            case 0: // no mines
                 Serial.print("  ");
                 break;
-            default:                    // a mine here
+            default: // a mine here
                 Serial.print("* ");
                 break;
             }
@@ -118,16 +115,16 @@ void display(bool show_bomb = false)
 
 void set_board_print_count(bool row_0_col_1, int num)
 {
-    if(row_0_col_1)
+    if (row_0_col_1)
         Serial.print("Please enter the COLUMN of the");
     else
         Serial.print("Please enter the ROW of the");
 
-    if(1 == num)
+    if (1 == num)
         Serial.println(" 1 ST mine:");
-    else if(2 == num)
+    else if (2 == num)
         Serial.println(" 2 ND mine:");
-    else if(3 == num)
+    else if (3 == num)
         Serial.println(" 3 RD mine:");
     else
         Serial.println(" 4 TH mine:");
@@ -145,33 +142,33 @@ bool set_board_get_input(int loc_count)
     bool invalid_input = true;
 
     // input ROW
-    while(1)
+    while (1)
     {
         set_board_print_count(false, loc_count);
         wait_till_serial_available();
         loc_row = Serial.read() - '0';
 
-        if(loc_row < 0 || loc_row > 3)
+        if (loc_row < 0 || loc_row > 3)
             Serial.println("Wrong Input Index!");
         else
             break;
     }
 
     // input COLUMN
-    while(1)
+    while (1)
     {
         set_board_print_count(true, loc_count);
         wait_till_serial_available();
         loc_col = Serial.read() - '0';
 
-        if(loc_col < 0 || loc_col > 3)
+        if (loc_col < 0 || loc_col > 3)
             Serial.println("Wrong Input Index!");
         else
             break;
     }
 
     invalid_input = (0 == loc_row && 0 == loc_col) || (3 == loc_row && 3 == loc_col) || (1 == opponent_board[loc_row][loc_col]);
-    if(invalid_input)
+    if (invalid_input)
     {
         Serial.println("Invalid input location. Please try again.");
         return false;
@@ -183,7 +180,6 @@ bool set_board_get_input(int loc_count)
     }
 }
 
-
 /**
  * 29 Jul
  */
@@ -193,30 +189,24 @@ void set_board()
     Serial.println("The locations of the 4*4 board starts at (0,0) and ends at (3,3).");
     Serial.println("You can set altogether 4 mines. Please do not set mines at (0,0) or (3,3).\n");
 
-    for(int i = 1; i <= 4; i++)
+    for (int i = 1; i <= 4; i++)
     {
-        while(!set_board_get_input(i))
+        while (!set_board_get_input(i))
         {
             delay(100);
         }
     }
 
-    Serial.println("\nOpponent Board Set!\n");
-
-    bombs_ready = 1;
-
-    // transmit
-    Serial.println("--- Ready to transmit ---");
+    Serial.println("\nYou have set the bombs for the opponent!\n");
 }
-
 
 void init_game()
 {
     int i = 0, j = 0, k = 0; // temp variables - for loop control
 
     // initialize the status of the board
-    for(i = 0; i <= 3; i++)
-        for(j = 0; j <= 3; j++)
+    for (i = 0; i <= 3; i++)
+        for (j = 0; j <= 3; j++)
             board[i][j] = 0;
     board[0][0] = 9;  // starting position
     board[3][3] = 10; // ending position
@@ -229,7 +219,13 @@ void init_game()
     // set board
     set_board();
 
-    while(2 != opponent_status)
+    send_bombs();
+
+    if (2 != opponent_status)
+    {
+        Serial.println("Waiting for the opponent...");
+    }
+    while (2 != opponent_status)
     {
         delay(100);
     }
@@ -340,43 +336,103 @@ void get_input()
     player_psn[1] = psn_temp[1];
 }
 
-void clean_up()
+void new_game()
 {
 
     init_game();
-    delay(3000);
+    delay(1000);
     Serial.println("\n\n--------------- NEW GAME ---------------\n\n");
     display();
 }
 
 void receiveEvent(int howMany)
 {
+    Serial.print(howMany);
+    Serial.print(" Bytes received.\n");
     if (8 == howMany)
     {
-        Serial.println("\nReceiving the board from master...\n");
-        for(int i = 0; i < 4; i++)
+        Serial.print("\nReceiving the board from master...");
+        for (int i = 0; i < 4; i++)
         {
             int x = Wire.read();
             int y = Wire.read();
             board[x][y] = 1;
         }
+        Serial.print("OK.\n");
+        opponent_status = 2;
+    }
+
+    else if (1 == howMany)
+    {
+        Serial.print("Your opponent has ");
+        int status = Wire.read();
+        if (-1 == status)
+        {
+            Serial.println("lost the game!");
+            opponent_status = -1;
+        }
+        else if (99 == status)
+        {
+            Serial.println("won the game!");
+            opponent_status = 99;
+        }
+        else
+        {
+            Serial.print("\nBAD MESSAGE RECEIVED: ");
+            Serial.print(status);
+            Serial.print("\n");
+        }
     }
 }
 
-void myHandler()
+void send_bombs()
 {
-    if (!bombs_ready)
-    {
-        Wire.write(233);
-        return;
-    }
+    Wire.begin(); // Become Master
+    Serial.println("Sending the bombs...");
+
+    Wire.beginTransmission(4); // transmit to device #4
 
     for (int i = 0; i <= 3; i++)
         for (int j = 0; j <= 1; j++)
             Wire.write(bombs[i][j]);
 
-    opponent_status = 2;
+    int temp = Wire.endTransmission(); // ends the transmission
 
+    Serial.print("Over. Return value ");
+    Serial.print(temp);
+    Serial.print("\n");
+
+    // Convert back to slave
+    Wire.begin(4);                // join i2c bus with address #4
+    Wire.onReceive(receiveEvent); // register event
+}
+
+void end_message(int my_state)
+{
+    Wire.begin(); // Become Master
+    Serial.println("Sending the result...");
+
+    Wire.beginTransmission(4); // transmit to device #4
+
+    Wire.write(my_state);
+
+    int temp = Wire.endTransmission(); // ends the transmission
+
+    Serial.print("Over. Return value ");
+    Serial.print(temp);
+    Serial.print("\n");
+
+
+    if (-2 == opponent_status)
+    {
+        Serial.println("Waiting for your opponent...")
+    }
+    while (-2 == opponent_status)
+    {
+        delay(100);
+    }
+
+    delay(3000);
 
 }
 
@@ -385,9 +441,8 @@ void setup()
     Serial.begin(9600);
     Wire.begin(4);                // join i2c bus with address #4
     Wire.onReceive(receiveEvent); // register event
-    Wire.onRequest(myHandler);
     randomSeed(analogRead(0));
-    clean_up();
+    new_game();
 }
 
 void loop()
@@ -400,6 +455,9 @@ void loop()
         Serial.println("BOOOOOOOOOOOM");
         Serial.println("BOOOOOOOOOOOM");
         Serial.println("BOOOOOOOOOOOM");
+
+        end_message(judge_state);
+
         clean_up();
     }
     else if (99 == judge_state)
@@ -408,6 +466,9 @@ void loop()
         Serial.println("Congratulations!!!!!!!!");
         Serial.println("Congratulations!!!!!!!!");
         Serial.println("Congratulations!!!!!!!!");
+
+        end_message(judge_state);
+
         clean_up();
     }
     else
