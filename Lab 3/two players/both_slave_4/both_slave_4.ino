@@ -422,8 +422,6 @@ void loop()
     {
         display(true);
         Serial.println("BOOOOOOOOOOOM");
-        Serial.println("BOOOOOOOOOOOM");
-        Serial.println("BOOOOOOOOOOOM");
 
         end_message(judge_state);
 
@@ -432,8 +430,6 @@ void loop()
     else if (99 == judge_state)
     {
         display(true);
-        Serial.println("Congratulations!!!!!!!!");
-        Serial.println("Congratulations!!!!!!!!");
         Serial.println("Congratulations!!!!!!!!");
 
         end_message(judge_state);
