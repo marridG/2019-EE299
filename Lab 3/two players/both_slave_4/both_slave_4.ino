@@ -140,6 +140,8 @@ bool set_board_get_input(int loc_count)
     else
     {
         opponent_board[loc_row][loc_col] = 1;
+        bombs[loc_count - 1][0] = loc_row;
+        bombs[loc_count - 1][1] = loc_col;
         display_set_board();
         return true;
     }
@@ -174,8 +176,10 @@ void init_game()
     // initialize the status of the board
     for (i = 0; i <= 3; i++)
         for (j = 0; j <= 3; j++)
+        {
             board[i][j] = 0;
-    opponent_board[i][j] = 0;
+            opponent_board[i][j] = 0;
+        }
     board[0][0] = 9;  // starting position
     board[3][3] = 10; // ending position
 
@@ -309,7 +313,14 @@ void get_input()
 
 void new_game()
 {
-
+    if (2 == opponent_status)
+    {
+        Serial.println("Waiting for your opponent to finish the game...");
+    }
+    while (2 == opponent_status)
+    {
+        delay(100);
+    }
     init_game();
     delay(1000);
     Serial.println("\n\n--------------- NEW GAME ---------------\n\n");
@@ -327,6 +338,11 @@ void receiveEvent(int howMany)
         {
             int x = Wire.read();
             int y = Wire.read();
+            Serial.print("\nReceive x y from slave: ");
+            Serial.print(x);
+            Serial.print("  ");
+            Serial.print(y);
+            Serial.print("\n");
             board[x][y] = 1;
         }
         Serial.print("OK.\n");
@@ -337,7 +353,7 @@ void receiveEvent(int howMany)
     {
         Serial.print("Your opponent has ");
         int status = Wire.read();
-        if (-1 == status)
+        if (255 == status)
         {
             Serial.println("lost the game!");
             opponent_status = -1;
@@ -401,8 +417,6 @@ void end_message(int my_state)
     {
         delay(100);
     }
-
-    delay(3000);
 }
 
 void setup()
