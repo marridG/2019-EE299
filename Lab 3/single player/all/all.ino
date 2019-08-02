@@ -5,75 +5,41 @@ int board[4][4] = {{0, 0, 0, 0},
 
 int player_psn[] = {0, 0};
 int life = 1;
+char board_char[] = {' ', '*', 'X', '!', '!', '.', '!', '!', '!', '>', '>'};
+
 
 void display(bool show_bomb = false)
 {
-    int flag;
+    Serial.print("           +---+---+---+---+\n");
     for (int j = 0; j < 4; ++j)
-    { //cout<<"--------------\n";
-        Serial.print("           ");
+    {
+        Serial.print("           |");
         for (int i = 0; i < 4; ++i)
         {
+            Serial.print(" ");
             if (player_psn[0] == j && player_psn[1] == i)
             {
-                Serial.print("@ ");
-                if (player_psn[1] == 3)
-                {
-                    Serial.print('\n');
-                }
+                Serial.print("@ |");
                 continue;
             }
-            flag = board[j][i];
 
-            switch (flag)
-            {
-            case 0:
-            {
-                Serial.print("  ");
-                break;
-            }
-            case 1:
+            if (1 == board[j][i])
             {
                 if (show_bomb)
                 {
-                    Serial.print("* ");
+                    Serial.print("* |");
+                    continue;
                 }
-                else
-                {
-                    Serial.print("  ");
-                }
-                break;
+                // else
+                Serial.print("  |");
+                continue;
             }
-            case 2:
-            {
-                Serial.print("X ");
-                break;
-            }
-            case 5:
-            {
-                Serial.print(". ");
-                break;
-            }
-            case 9:
-            {
-                Serial.print("> ");
-                break;
-            }
-            case 10:
-            {
-                Serial.print("> ");
-                break;
-            }
-
-            default:
-                break;
-            }
-
-            if (3 == i)
-                Serial.print("\n");
+            // else
+            Serial.print(board_char[board[j][i]]);
+            Serial.print(" |");
         }
+        Serial.print("\n           +---+---+---+---+\n");
     }
-    //cout<<"--------------\n";
     Serial.print("Life: ");
     Serial.println(life);
 }
