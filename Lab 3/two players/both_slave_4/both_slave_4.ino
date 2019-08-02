@@ -1,5 +1,6 @@
-#include <Wire.h>
+#include <Wire.h> // For communication
 
+// Record the user's board and his opponent's board
 int board[4][4] = {{0, 0, 0, 0},
                    {0, 0, 0, 0},
                    {0, 0, 0, 0},
@@ -9,31 +10,53 @@ int opponent_board[4][4] = {{0, 0, 0, 0},
                             {0, 0, 0, 0},
                             {0, 0, 0, 0}};
 
+// defines how to print out the board
 char board_char[] = {' ', '*', 'X', '!', '!', '.', '!', '!', '!', '>', '>'};
 
+// record the user's position and his remaining life
 int player_psn[] = {0, 0};
 int life = 1;
 
+// to record the bombs on the opponent's baord
 int bombs[4][2] = {0};
 int opponent_status = -99; // 2 for bombs set, -1 for he loses, 99 for he wins
 
+/*
+Param, Returns : None
+
+Print out the opponent's board while setting up bombs
+
+Ziliang Guo July 29, 2019 Rev 0.
+Tutian Tang July 31, 2019 Rev 1.
+ */
 void display_set_board()
 {
-    Serial.print("           +---+---+---+---+\n");
-    for (int j = 0; j < 4; ++j)
-    {
-        Serial.print("           |");
-        for (int i = 0; i < 4; ++i)
-        {
-            Serial.print(" ");
-            Serial.print(board_char[opponent_board[j][i]]);
-            Serial.print(" |");
-        }
-        Serial.print("\n           +---+---+---+---+\n");
-    }
-}
+    Serial.print("           +---+---+---+---+\n");         // head of the board
+    for (int j = 0; j < 4; ++j)                             // start with rows
+    {                                                       //
+        Serial.print("           |");                       // then columns
+        for (int i = 0; i < 4; ++i)                         //
+        {                                                   //
+            Serial.print(" ");                              //
+            Serial.print(board_char[opponent_board[j][i]]); // check which char to use
+            Serial.print(" |");                             //
+        }                                                   //
+        Serial.print("\n           +---+---+---+---+\n");   //
+    }                                                       //
+} 
 
-void display(bool show_bomb = false)
+
+/*
+Params: show_bomb: whether to display the bombs
+
+Returns : None
+
+Print out the opponent's board while setting up bombs
+
+Shihao Piao July 27, 2019 Rev 0.
+Tutian Tang July 31, 2019 Rev 1.
+ */
+void display(bool show_bomb = false) // The code talks and it's similar to the function above
 {
     Serial.print("           +---+---+---+---+\n");
     for (int j = 0; j < 4; ++j)
@@ -183,6 +206,8 @@ void init_game()
     player_psn[0] = 0;
     player_psn[1] = 0;
 
+    opponent_status = -99;
+
     // set board
     set_board();
 
@@ -321,8 +346,8 @@ void new_game()
 
 void receiveEvent(int howMany)
 {
-    Serial.print(howMany);
-    Serial.print(" Bytes received.\n");
+    // Serial.print(howMany);
+    // Serial.print(" Bytes received.\n");
     if (8 == howMany)
     {
         Serial.print("\nReceiving the board from master...");
@@ -330,11 +355,11 @@ void receiveEvent(int howMany)
         {
             int x = Wire.read();
             int y = Wire.read();
-            Serial.print("\nReceive x y from slave: ");
-            Serial.print(x);
-            Serial.print("  ");
-            Serial.print(y);
-            Serial.print("\n");
+            // Serial.print("\nReceive x y from slave: ");
+            // Serial.print(x);
+            // Serial.print("  ");
+            // Serial.print(y);
+            // Serial.print("\n");
             board[x][y] = 1;
         }
         Serial.print("OK.\n");
@@ -377,9 +402,9 @@ void send_bombs()
 
     int temp = Wire.endTransmission(); // ends the transmission
 
-    Serial.print("Over. Return value ");
-    Serial.print(temp);
-    Serial.print("\n");
+    // Serial.print("Over. Return value ");
+    // Serial.print(temp);
+    Serial.print("OK.\n");
 
     // Convert back to slave
     Wire.begin(4);                // join i2c bus with address #4
@@ -397,9 +422,9 @@ void end_message(int my_state)
 
     int temp = Wire.endTransmission(); // ends the transmission
 
-    Serial.print("Over. Return value ");
-    Serial.print(temp);
-    Serial.print("\n");
+    // Serial.print("Over. Return value ");
+    // Serial.print(temp);
+    Serial.print("OK.\n");
 
     if (-2 == opponent_status)
     {
