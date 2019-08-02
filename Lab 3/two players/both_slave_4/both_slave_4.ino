@@ -43,19 +43,23 @@ void display_set_board()
         }                                                   //
         Serial.print("\n           +---+---+---+---+\n");   //
     }                                                       //
-} 
+}
 
-
-/*
-Params: show_bomb: whether to display the bombs
-
-Returns : None
-
-Print out the opponent's board while setting up bombs
-
-Shihao Piao July 27, 2019 Rev 0.
-Tutian Tang July 31, 2019 Rev 1.
- */
+//--------------------------------------------
+//display
+//
+//Purpose:
+//  display the result and games on the monitor
+//parameters:
+//  player position and show_bomb
+//
+//Method:
+//  judge the position and the mine position and use
+//  char array to choose the punctuation we want to use.
+//
+// Shihao Piao July 27, 2019 Rev 0.
+// Tutian Tang July 31, 2019 Rev 1.
+//-------------------------------------------
 void display(bool show_bomb = false) // The code talks and it's similar to the function above
 {
     Serial.print("           +---+---+---+---+\n");
@@ -88,7 +92,7 @@ void display(bool show_bomb = false) // The code talks and it's similar to the f
         }
         Serial.print("\n           +---+---+---+---+\n");
     }
-    Serial.print("Life: ");
+    Serial.print("Life: "); // print the remaining number of life
     Serial.println(life);
 }
 
@@ -269,7 +273,7 @@ void get_input()
 
     char input_char = Serial.read();
 
-    int psn_temp[2] = {0, 0}; // int psn_temp[2] = {player_psn[0], player_psn[1]}; leads to an error
+    int psn_temp[2] = {0, 0}; // record the player psn
     psn_temp[0] = player_psn[0];
     psn_temp[1] = player_psn[1];
 
@@ -313,7 +317,7 @@ void get_input()
         invalid_input();
         return;
     }
-    // valid
+    // valid, print the user input
     Serial.print("\nPlayer moved from (");
     Serial.print(player_psn[0]);
     Serial.print(",");
@@ -346,26 +350,21 @@ void new_game()
 
 void receiveEvent(int howMany)
 {
-    // Serial.print(howMany);
-    // Serial.print(" Bytes received.\n");
+    // 8 Bytes received, that is, the bombs
     if (8 == howMany)
     {
         Serial.print("\nReceiving the board from master...");
         for (int i = 0; i < 4; i++)
         {
-            int x = Wire.read();
+            int x = Wire.read(); // get x and y from slave
             int y = Wire.read();
-            // Serial.print("\nReceive x y from slave: ");
-            // Serial.print(x);
-            // Serial.print("  ");
-            // Serial.print(y);
-            // Serial.print("\n");
             board[x][y] = 1;
         }
         Serial.print("OK.\n");
         opponent_status = 2;
     }
 
+    // 1 byte received, that is, the result of the opponent
     else if (1 == howMany)
     {
         Serial.print("Your opponent has ");
@@ -391,20 +390,17 @@ void receiveEvent(int howMany)
 
 void send_bombs()
 {
-    Wire.begin(); // Become Master
-    Serial.println("Sending the bombs...");
-
-    Wire.beginTransmission(4); // transmit to device #4
-
-    for (int i = 0; i <= 3; i++)
-        for (int j = 0; j <= 1; j++)
-            Wire.write(bombs[i][j]);
-
-    int temp = Wire.endTransmission(); // ends the transmission
-
-    // Serial.print("Over. Return value ");
-    // Serial.print(temp);
-    Serial.print("OK.\n");
+    Wire.begin();                           // Become Master
+    Serial.println("Sending the bombs..."); //
+                                            //
+    Wire.beginTransmission(4);              // transmit to device #4
+                                            //
+    for (int i = 0; i <= 3; i++)            //
+        for (int j = 0; j <= 1; j++)        //
+            Wire.write(bombs[i][j]);        // send the psn of the bombs
+                                            //
+    Wire.endTransmission();                 // ends the transmission
+    Serial.print("OK.\n");                  // Notify the user
 
     // Convert back to slave
     Wire.begin(4);                // join i2c bus with address #4
@@ -413,18 +409,12 @@ void send_bombs()
 
 void end_message(int my_state)
 {
-    Wire.begin(); // Become Master
-    Serial.println("Sending the result...");
-
-    Wire.beginTransmission(4); // transmit to device #4
-
-    Wire.write(my_state);
-
-    int temp = Wire.endTransmission(); // ends the transmission
-
-    // Serial.print("Over. Return value ");
-    // Serial.print(temp);
-    Serial.print("OK.\n");
+    Wire.begin();                            // Become Master
+    Serial.println("Sending the result..."); //
+    Wire.beginTransmission(4);               // transmit to device #4
+    Wire.write(my_state);                    //
+    Wire.endTransmission();                  // ends the transmission
+    Serial.print("OK.\n");                   // Notify the user
 
     if (-2 == opponent_status)
     {
@@ -447,6 +437,7 @@ void setup()
 
 void loop()
 {
+    // it's the standard game loop
     get_input();
     int judge_state = judge();
     if (-1 == judge_state)
