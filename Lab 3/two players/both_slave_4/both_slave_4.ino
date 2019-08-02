@@ -22,7 +22,6 @@ void display_set_board()
     Serial.print("           +---+---+---+---+\n");
     for (int j = 0; j < 4; ++j)
     {
-        //cout<<"--------------\n";
         Serial.print("           |");
         for (int i = 0; i < 4; ++i)
         {
@@ -32,7 +31,6 @@ void display_set_board()
         }
         Serial.print("\n           +---+---+---+---+\n");
     }
-    //cout<<"--------------\n";
 }
 
 void display(bool show_bomb = false)
@@ -67,7 +65,6 @@ void display(bool show_bomb = false)
         }
         Serial.print("\n           +---+---+---+---+\n");
     }
-    //cout<<"--------------\n";
     Serial.print("Life: ");
     Serial.println(life);
 }
