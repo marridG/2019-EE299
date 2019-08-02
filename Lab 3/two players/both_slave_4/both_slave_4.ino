@@ -37,19 +37,16 @@ void display_set_board()
 
 void display(bool show_bomb = false)
 {
+    Serial.print("           +---+---+---+---+\n");
     for (int j = 0; j < 4; ++j)
     {
-        //cout<<"--------------\n";
-        Serial.print("           ");
+        Serial.print("           |");
         for (int i = 0; i < 4; ++i)
         {
+            Serial.print(" ");
             if (player_psn[0] == j && player_psn[1] == i)
             {
-                Serial.print("@ ");
-                if (player_psn[1] == 3)
-                {
-                    Serial.print('\n');
-                }
+                Serial.print("@ |");
                 continue;
             }
 
@@ -57,20 +54,18 @@ void display(bool show_bomb = false)
             {
                 if (show_bomb)
                 {
-                    Serial.print("* ");
+                    Serial.print("* |");
+                    continue;
                 }
-                else
-                {
-                    Serial.print("  ");
-                }
+                // else
+                Serial.print("  |");
+                continue;
             }
-            else
-            {
-                Serial.print(board_char[board[j][i]]);
-                Serial.print(' ');
-            }
+            // else
+            Serial.print(board_char[board[j][i]]);
+            Serial.print(" |");
         }
-        Serial.print("\n");
+        Serial.print("\n           +---+---+---+---+\n");
     }
     //cout<<"--------------\n";
     Serial.print("Life: ");
