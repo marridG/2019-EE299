@@ -3,14 +3,29 @@ int board[4][4] = {{0, 0, 0, 0},
                    {0, 0, 0, 0},
                    {0, 0, 0, 0}};
 
-int player_psn[] = {0, 0};
+int player_psn[] = {0, 0};//player position
 int life = 1;
+//prepare for the display
 char board_char[] = {' ', '*', 'X', '!', '!', '.', '!', '!', '!', '>', '>'};
 
+//--------------------------------------------
+//display
+//
+//Purpose:
+//  display the result and games on the monitor
+//parameters:
+//  player position and show_bomb
+//
+//Method:
+//  judge the position and the mine position and use 
+//  char array to choose the punctuation we want to use.
+// 
+//-------------------------------------------
 
 void display(bool show_bomb = false)
 {
     Serial.print("           +---+---+---+---+\n");
+    //use for loop print the board
     for (int j = 0; j < 4; ++j)
     {
         Serial.print("           |");
