@@ -83,6 +83,7 @@ byte two[8] = {
   B00000,
 };
 void setup() {
+  lcd.clear();
   lcd.createChar(0, zero);
   lcd.createChar(1, one);
   lcd.createChar(2, two);
@@ -91,7 +92,7 @@ void setup() {
   lcd.createChar(5, plane);
   lcd.createChar(6, star);
   lcd.createChar(7, bomb);
-  lcd.begin(0,0);
+  lcd.begin(16, 2);
   lcd.write(byte(0));
   lcd.write(byte(1));
   lcd.write(byte(2));
