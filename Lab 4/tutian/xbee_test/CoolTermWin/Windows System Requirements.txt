@@ -1,0 +1,15 @@
+Operating System:
+-----------------
+- Windows 7 SP1
+- Windows 8.x
+- Windows 10
+
+CoolTerm for Windows is a portable application and can be installed anywhere on your system.
+
+Note to Windows 7 and Windows 8.x users:
+----------------------------------------
+CoolTerm requires the new Universal Runtime from Microsoft, which is distributed automatically with Windows Update and included with Windows 10. If you don't receive automatic updates, you can download it directly from Microsoft here:
+
+https://www.microsoft.com/en-us/download/details.aspx?id=49984
+
+Alternatively, if you do not have access to the internet or can't install the Universal Runtime for any reason, the components necessary to run CoolTerm have been included with the CoolTerm download and can be found in in the "CoolTerm Libs" folder. Simply extract the contents of the "Windows Runtime.zip" into the same folder as CoolTerm.exe.
