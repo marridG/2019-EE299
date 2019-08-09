@@ -133,17 +133,21 @@ void setup()
 
 void loop()
 {
+    static int count = 0;
     int game_status = 0;
+
+    count++;
     get_input();
 
     update_psn();
-    update_board_except_player();
+    if (count % 8 == 0)
+        update_board_except_player();
 
     game_status = judge();
 
     display();
 
-    delay(1000);
+    delay(100);
 
     if (debug_mode)
     {
@@ -246,21 +250,16 @@ int rotation_location()
  */
 bool tilt_changed()
 {
-    bool up_tilt = false;
-    if (digitalRead(TILT))
+    static bool up_tilt = false;
+    if (digitalRead(TILT) != up_tilt)
     {
-        up_tilt = true;
+        up_tilt = !up_tilt;
         if (debug_mode)
-            Serial.println("Tilt Up.");
-    }
-    else
-    {
-        up_tilt = false;
-        if (debug_mode)
-            Serial.println("Tile Down.");
+            Serial.println("Tile Enabled");
+        return true;
     }
 
-    return up_tilt;
+    return false;
 }
 
 /**
@@ -279,7 +278,6 @@ void move_board_elements()
  */
 void skill_launched()
 {
-    return;
     for (int i = 12; i >= 1; i--)
         board[i] = 0;
     skill--;
@@ -289,7 +287,7 @@ void skill_launched()
 
 void update_board_except_player()
 {
-    if (message[0])
+    if (message[2] && skill > 0)
         skill_launched();
     if (board[12] == board[13])
     {
@@ -334,7 +332,9 @@ void get_input()
 
     // the status of the skill
     if (tilt_changed())
-        message[2] = !message[2];
+        message[2] = 1;
+    else
+        message[2] = 0;
 }
 
 void display()
@@ -380,8 +380,8 @@ void display()
     lcd.setCursor(1, 0);
     lcd.write(byte(3));
 
-    Serial.print("FUCK  ");
-    Serial.println(board[13]);
+    // Serial.print("FUCK  ");
+    // Serial.println(board[13]);
 
     //skill
     lcd.setCursor(0, 1);
