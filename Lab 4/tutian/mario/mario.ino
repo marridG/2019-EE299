@@ -280,7 +280,7 @@ void buzz(int targetPin, long frequency, long length) {
   //// get the total number of cycles to produce
   for (long i = 0; i < numCycles; i++) { // for the calculated length of time...
     digitalWrite(targetPin, HIGH); // write the buzzer pin high to push out the diaphram
-    delayMicroseconds(delayValue); // wait for the calculated delay value
+    delayMicroseconds(delayValue/2); // wait for the calculated delay value
     digitalWrite(targetPin, LOW); // write the buzzer pin low to pull back the diaphram
     delayMicroseconds(delayValue); // wait again or the calculated delay value
   }
