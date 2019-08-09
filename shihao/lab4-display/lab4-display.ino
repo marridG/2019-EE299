@@ -82,6 +82,12 @@ byte two[8] = {
   B00000,
   B00000,
 };
+int board[14]={0,-1,1,-1,1,-1,1,-1,1,-1,1,-1,1,-1};
+int life=2;
+int skill=1;
+int alienp=1;
+int planep=-1;
+
 void setup() {
   lcd.clear();
   lcd.createChar(0, zero);
@@ -92,19 +98,80 @@ void setup() {
   lcd.createChar(5, plane);
   lcd.createChar(6, star);
   lcd.createChar(7, bomb);
-  lcd.begin(16, 2);
-  lcd.write(byte(0));
-  lcd.write(byte(1));
-  lcd.write(byte(2));
-  lcd.write(byte(3));
-  lcd.write(byte(4));
-  lcd.write(byte(5));
-  lcd.write(byte(6));
-  lcd.write(byte(7));
-
+  lcd.begin(16,2);
 }
+void display()
+{
+  lcd.clear();
+ if(1==alienp)
+ {
+  lcd.setCursor(15,0);
+  lcd.write(byte(4));
+  }
+  if(-1==alienp)
+  {
+    lcd.setCursor(15,1);
+    lcd.write(byte(4));
+    }
+    for(int i=0;i<14;++i)
+    {
+      if(1==board[i])
+      {
+        lcd.setCursor(15-i,0);
+        lcd.write(byte(7));
+        }
+        if(-1==board[i])
+        {
+          lcd.setCursor(15-i,1);
+          lcd.write(byte(7));
+          }
+      }
+      if(1==planep)
+      {
+        lcd.setCursor(2,0);
+        lcd.write(byte(5));
+        }
+        if(-1==planep)
+        {
+          lcd.setCursor(2,1);
+          lcd.write(byte(5));
+          }
+       lcd.setCursor(1,1);
+       lcd.write(byte(6));
+       lcd.setCursor(1,0);
+       lcd.write(byte(3));
 
+       //skill
+       lcd.setCursor(0,1);
+       if(0==skill)
+       {
+        lcd.write(byte(0));
+        }
+        if(1==skill)
+       {
+        lcd.write(byte(1));
+        }
+        if(2==skill)
+       {
+        lcd.write(byte(2));
+        }
+
+        //life
+        lcd.setCursor(0,0);
+       if(0==life)
+       {
+        lcd.write(byte(0));
+        }
+        if(1==life)
+       {
+        lcd.write(byte(1));
+        }
+        if(2==life)
+       {
+        lcd.write(byte(2));
+        }
+  }
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  display();
+  delay(500);
 }
