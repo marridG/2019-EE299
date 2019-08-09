@@ -108,11 +108,11 @@ int skill = 2;
 // ---------  [END] global variables  ---------
 
 
-// ---------  [START] function list  ---------
+// ---------  [START] function prototypes  ---------
 void initiate_game();
 // void 	button_blink();
 bool button_pressed();
-int rotation_location();
+int  rotation_location();
 bool tilt_changed();
 
 void move_board_elements();
@@ -121,11 +121,11 @@ void skill_launched();
 void update_board_except_player();
 void update_psn();
 
-int judge();
+int  judge();
 void get_input();
 
 void display();
-// ---------  [END] function list  ---------
+// ---------  [END] function prototypes  ---------
 
 
 void setup()
