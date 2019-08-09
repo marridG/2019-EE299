@@ -100,7 +100,7 @@ int skill = 2;
 void initiate_game();
 // void 	button_blink();
 bool button_pressed();
-bool rotation_location();
+int rotation_location();
 bool tilt_changed();
 
 void move_board_elements();
@@ -136,7 +136,14 @@ void loop()
     int game_status = 0;
     get_input();
     update_board_except_player();
+
+    update_psn();
     game_status = judge();
+
+    display();
+
+    delay(1000);
+
     if (debug_mode)
     {
         Serial.print("Status: ");
@@ -149,8 +156,6 @@ void loop()
         Serial.print(message[2]);
         Serial.println("\n");
     }
-
-    delay(2000);
 }
 
 void initiate_game()
@@ -158,10 +163,16 @@ void initiate_game()
     int i = 0;
     for (i = 0; i <= 13; i++)
         board[i] = 0;
-    for (int i = 0; i <= 3; i++)
-        message[i] = 0;
+
     skill = 2;
     life = 2;
+
+    board[0] = 1;
+    board[13] = 1;
+
+    message[0] = board[0];
+    message[1] = board[13];
+    message[2] = 0;
 }
 
 // void button_blink()
@@ -189,11 +200,6 @@ bool button_pressed()
     }
     else
         Serial.println("Button NOT pressed.");
-
-    // if a button is pressed, delay
-    if (status_change)
-        delay(50);
-
     return status_change;
 }
 
@@ -201,20 +207,20 @@ bool button_pressed()
  * [rotation_location description]
  *     Judge the location of the rotation
  * @return [description]
- *     true:	right side
- *     false:	left side
+ *     1:	right side
+ *     -1:	left side
  */
-bool rotation_location()
+int rotation_location()
 {
     int threshold = 511;
     int value = 0;
-    bool status = false; // false for left and true for right
+    int status = -1; // -1 for left and 1 for right
 
     value = analogRead(ROTATION);
     if (value > threshold) // rotated to the right side
-        status = true;
+        status = 1;
     else
-        status = false;
+        status = -1;
 
     // debugging outputs
     if (debug_mode)
@@ -227,7 +233,6 @@ bool rotation_location()
         else
             Serial.println("Left");
     }
-    delay(50);
     return status;
 }
 
@@ -254,10 +259,6 @@ bool tilt_changed()
             Serial.println("Tile Down.");
     }
 
-    // if the tilt is up, delay
-    if (up_tilt)
-        delay(50);
-
     return up_tilt;
 }
 
@@ -277,6 +278,7 @@ void move_board_elements()
  */
 void skill_launched()
 {
+    return;
     for (int i = 12; i >= 1; i--)
         board[i] = 0;
     skill--;
@@ -299,6 +301,12 @@ void update_board_except_player()
     board[1] = board[0];
 }
 
+void update_psn()
+{
+    board[0] = message[0];
+    board[13] = message[1]; // hider
+}
+
 /**
  * [judge description]
  *     judge the status of the game
@@ -318,7 +326,7 @@ void get_input()
 {
     // the location of the attacker - using button
     if (button_pressed())
-        message[0] = !message[0];
+        message[0] = (-1) * message[0];
 
     // the location of the hider - using rotation
     message[1] = rotation_location();
@@ -328,23 +336,10 @@ void get_input()
         message[2] = !message[2];
 }
 
-void setup()
-{
-    lcd.clear();
-    lcd.createChar(0, zero);
-    lcd.createChar(1, one);
-    lcd.createChar(2, two);
-    lcd.createChar(3, heart);
-    lcd.createChar(4, alien);
-    lcd.createChar(5, plane);
-    lcd.createChar(6, star);
-    lcd.createChar(7, bomb);
-    lcd.begin(16, 2);
-}
 void display()
 {
     lcd.clear();
-    if (1 == board[0])
+    if (1 == board[0]) // attacker
     {
         lcd.setCursor(15, 0);
         lcd.write(byte(4));
@@ -354,7 +349,7 @@ void display()
         lcd.setCursor(15, 1);
         lcd.write(byte(4));
     }
-    for (int i = 0; i < 14; ++i)
+    for (int i = 1; i <= 12; ++i)
     {
         if (1 == board[i])
         {
@@ -366,8 +361,10 @@ void display()
             lcd.setCursor(15 - i, 1);
             lcd.write(byte(7));
         }
+        // Serial.print("FUCK  ");
+        // Serial.println(board[i]);
     }
-    if (1 == board[13])
+    if (1 == board[13]) // hider
     {
         lcd.setCursor(2, 0);
         lcd.write(byte(5));
@@ -381,6 +378,9 @@ void display()
     lcd.write(byte(6));
     lcd.setCursor(1, 0);
     lcd.write(byte(3));
+
+    Serial.print("FUCK  ");
+    Serial.println(board[13]);
 
     //skill
     lcd.setCursor(0, 1);
