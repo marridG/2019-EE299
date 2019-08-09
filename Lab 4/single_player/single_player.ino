@@ -135,9 +135,10 @@ void loop()
 {
     int game_status = 0;
     get_input();
-    update_board_except_player();
 
     update_psn();
+    update_board_except_player();
+
     game_status = judge();
 
     display();
@@ -217,7 +218,7 @@ int rotation_location()
     int status = -1; // -1 for left and 1 for right
 
     value = analogRead(ROTATION);
-    if (value > threshold) // rotated to the right side
+    if (value < threshold) // rotated to the right side
         status = 1;
     else
         status = -1;
