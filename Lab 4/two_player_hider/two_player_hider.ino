@@ -2,7 +2,7 @@
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7, 8);
 
 // ---------  [START] global variables  ---------
-bool debug_mode = true;
+bool debug_mode = false;
 
 // the pins
 const int BUTTON = 10;  // D10
@@ -117,7 +117,7 @@ void display();
 // ---------  [END] function prototypes  ---------
 void send_message()
 {
-  // hider needs to send 1 and 2 
+  // hider needs to send 1 and 2
   Serial.write(message[1]);
   Serial.write(message[2]);
 }
@@ -147,6 +147,16 @@ void setup()
   lcd.createChar(6, star);
   lcd.createChar(7, bomb);
   lcd.begin(16, 2);
+
+  //syncing
+  while (Serial.available <= 0)
+  {
+    Serial.write(110);
+  }
+  while (Serial.available > 0)
+  {
+    Serial.read();
+  }
 
   initiate_game();
 }
