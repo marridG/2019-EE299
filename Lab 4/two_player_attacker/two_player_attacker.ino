@@ -162,7 +162,6 @@ void loop()
   count++;
   get_input();
 
-  static int data_received = 0;
   // for attacker
   // first send and then read
   send_message();
