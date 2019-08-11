@@ -119,17 +119,18 @@ void display();
 void send_message()
 {
   // attacker just need to send his position
-  Serial.write(message[0]);
+  Serial.write(message[0]+100);
 }
 
 void read_message()
 {
-  while (Serial.available <= 1)
+  while (Serial.available() <= 1)
   {
     delay(10);
   }
-  message[1] = Serial.read();
-  message[2] = Serial.read();
+  message[1] = Serial.read()-100;
+      delay(50);
+  message[2] = Serial.read()-100;
 }
 
 void setup()
@@ -138,6 +139,9 @@ void setup()
   pinMode(BUTTON, INPUT);
   pinMode(ROTATION, INPUT);
   pinMode(TILT, INPUT);
+
+  pinMode(13, OUTPUT);
+  digitalWrite(13, LOW);
 
   lcd.clear();
   lcd.createChar(0, zero);
@@ -151,14 +155,18 @@ void setup()
   lcd.begin(16, 2);
 
   //syncing
-  while (Serial.available <= 0)
+  while (Serial.available() <= 0)
   {
+    delay(50);
     Serial.write(110);
   }
-  while (Serial.available > 0)
+  while (Serial.available() > 0)
   {
+    delay(50);
     Serial.read();
   }
+
+  digitalWrite(13, HIGH);
 
   initiate_game();
 }
@@ -177,7 +185,7 @@ void loop()
   read_message();
 
   update_psn();
-  if (count % 8 == 0)
+  if (count % 4 == 0)
     update_board_except_player();
 
   display();
@@ -190,7 +198,7 @@ void loop()
     return;
   }
 
-  delay(100);
+  delay(200);
 
   if (debug_mode)
   {
@@ -247,7 +255,7 @@ bool button_pressed()
     if (debug_mode)
       Serial.println("Button Pressed.");
   }
-  else
+  else if (debug_mode)
     Serial.println("Button NOT pressed.");
   return status_change;
 }
@@ -406,8 +414,6 @@ void display()
       lcd.setCursor(15 - i, 1);
       lcd.write(byte(7));
     }
-    // Serial.print("FUCK  ");
-    // Serial.println(board[i]);
   }
   if (1 == board[13]) // hider
   {
@@ -423,9 +429,6 @@ void display()
   lcd.write(byte(6));
   lcd.setCursor(1, 0);
   lcd.write(byte(3));
-
-  // Serial.print("FUCK  ");
-  // Serial.println(board[13]);
 
   //skill
   lcd.setCursor(0, 1);
