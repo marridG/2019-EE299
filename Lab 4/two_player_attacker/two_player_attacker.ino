@@ -15,6 +15,7 @@ int message[3] = {0, 0, 0}; // {attacker, hider, skill}
 int life = 2;
 int skill = 2;
 // Custom Icons
+//create the heart
 byte heart[8] = {
     B00000,
     B00110,
@@ -25,6 +26,7 @@ byte heart[8] = {
     B00000,
     B00000,
 };
+//create the alien-attacker
 byte alien[8] = {
     B00000,
     B10111,
@@ -35,6 +37,7 @@ byte alien[8] = {
     B00000,
     B00000,
 };
+//create the plane--hider
 byte plane[8] = {
     B01000,
     B11100,
@@ -45,6 +48,7 @@ byte plane[8] = {
     B01000,
     B00000,
 };
+//create the star
 byte star[8] = {
     B00000,
     B10010,
@@ -55,6 +59,7 @@ byte star[8] = {
     B00000,
     B00000,
 };
+//create the bomb
 byte bomb[8] = {
     B00000,
     B01000,
@@ -65,6 +70,7 @@ byte bomb[8] = {
     B00000,
     B00000,
 };
+//create the zero
 byte zero[8] = {
     B00000,
     B00000,
@@ -75,6 +81,7 @@ byte zero[8] = {
     B00000,
     B00000,
 };
+//create the one
 byte one[8] = {
     B00000,
     B00000,
@@ -85,6 +92,7 @@ byte one[8] = {
     B00000,
     B00000,
 };
+//create the two
 byte two[8] = {
     B00000,
     B00000,
@@ -144,6 +152,7 @@ void setup()
   digitalWrite(13, LOW);
 
   lcd.clear();
+  //let the created ikons work and put in the byte 
   lcd.createChar(0, zero);
   lcd.createChar(1, one);
   lcd.createChar(2, two);
@@ -392,7 +401,8 @@ void get_input()
 void display()
 {
   lcd.clear();
-  if (1 == board[0]) // attacker
+  // attacker
+  if (1 == board[0]) 
   {
     lcd.setCursor(15, 0);
     lcd.write(byte(4));
@@ -402,6 +412,7 @@ void display()
     lcd.setCursor(15, 1);
     lcd.write(byte(4));
   }
+  //show bombs
   for (int i = 1; i <= 12; ++i)
   {
     if (1 == board[i])
@@ -415,7 +426,8 @@ void display()
       lcd.write(byte(7));
     }
   }
-  if (1 == board[13]) // hider
+   // hider
+  if (1 == board[13])
   {
     lcd.setCursor(2, 0);
     lcd.write(byte(5));
@@ -425,8 +437,10 @@ void display()
     lcd.setCursor(2, 1);
     lcd.write(byte(5));
   }
+  //show skill
   lcd.setCursor(1, 1);
   lcd.write(byte(6));
+  //show life
   lcd.setCursor(1, 0);
   lcd.write(byte(3));
 
