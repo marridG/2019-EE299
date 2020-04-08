@@ -1,2 +1,4 @@
-# EE299-2019
-UW GECEP 2019
+# EE299
+Introduction to C and Microprocessors Lab
+
+GECEP Program, UW, 2019 Summer
